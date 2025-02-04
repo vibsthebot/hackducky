@@ -25,16 +25,30 @@ Hackducky is hackclubs own version of making a USB rubber ducky built by hackclu
 4. Insert the MicroSD card into the HackDucky with your file loaded
 5. Connect to target computer using either USB port and watch the computer be taken over ! ( ethically ofc)
 
-# Submission Criteria
-1 - Needs to take a minimum of 3-4 hours for the hackducky light and 5-6 for the hackducky pro - Track your hours with wakatime
-2 - Needs to have 3 Core Feautures - Not just 3 normal things it does - EG 
-    1 - Open Notepad and start typing gibberish also set the background to ...
-    2 - Open terminal run a couple commands and popups to scare the user
-    3 - Fake a system crash by making the laptop download a bluescreen image and freezing up the mouse
-    ( These are just examples for core features )
-3 - Needs to have 5 - 7 normal features such as actions outside core features - The more the better!
-4 - Needs to be an original idea not just copy or a tutorial you found online - Tutorials are ok but I would reccomend making your own
-5 - You Can submit more than one but only get 1 hackducky max - pro or light
+# Submission Criteria  
+
+## 1. Time Requirement  
+- **HackDucky Light:** Minimum of **3-4 hours** of development.  
+- **HackDucky Pro:** Minimum of **5-6 hours** of development.  
+- **Tracking:** Use **WakaTime** to track your development hours.  
+
+## 2. Core Features (Must have 3)  
+- Not just simple actions—core features should be impactful and unique.  
+- **Examples:**  
+  1. Open Notepad, start typing gibberish, and change the desktop background.  
+  2. Open the terminal, run commands, and create pop-ups to scare the user.  
+  3. Fake a system crash by downloading a **blue screen image** and freezing the mouse.  
+
+## 3. Additional Features (Must have 5-7)  
+- Include **at least 5-7 normal features** outside of the core features.  
+- The more features, the better!  
+
+## 4. Originality  
+- Your project must be an **original idea** and not a direct copy from a tutorial.  
+- Tutorials can be referenced, but your submission should be your own creation.  
+
+## 5. Submission Limit  
+- You can submit **multiple projects**, but you can only receive **one HackDucky** (either Pro or Light).  
 
 
 ## What the LED indicators mean
