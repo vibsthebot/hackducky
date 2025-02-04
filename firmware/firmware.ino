@@ -27,6 +27,10 @@ File scriptFile;
 #define USB_MODE_STORAGE 2
 #define USB_MODE_BOTH 3
 
+#define ERROR_LED_PATTERN 3
+#define SUCCESS_LED_PATTERN 2
+#define WORKING_LED_PATTERN 1
+
 struct KeyboardState {
   bool capsLock = false;
   bool numLock = false;
@@ -52,6 +56,7 @@ struct KeyboardState {
   bool inLoop = false;
   
   uint8_t currentMode = USB_MODE_HID;
+  String currentLocale = "US";
 } kbState;
 
 bool exfilModeEnabled = false;
@@ -151,6 +156,18 @@ void runScript() {
   scriptFile.close();  
 }
 
+void handleError(const char* error) {
+  Serial.print("ERROR: ");
+  Serial.println(error);
+  
+  for(int i = 0; i < 3; i++) {
+    digitalWrite(LED_PIN, HIGH);
+    delay(100);
+    digitalWrite(LED_PIN, LOW);
+    delay(100);
+  }
+}
+
 void parseDuckyScript(String line) {
   line.trim();
   
@@ -158,52 +175,120 @@ void parseDuckyScript(String line) {
     return;
   }
 
-  if (kbState.defaultDelay > 0) {
-    delay(kbState.defaultDelay);
-  }
-
-  if (line.startsWith("DEFAULT_DELAY") || line.startsWith("DEFAULTDELAY")) {
-    kbState.defaultDelay = line.substring(line.indexOf(' ') + 1).toInt();
+  if (line.length() > 256) {
+    handleError("Command too long");
     return;
   }
 
-  if (line.startsWith("DELAY")) {
-    delay(line.substring(6).toInt());
-    return;
-  }
-
-  if (line.startsWith("STRING")) {
-    bool addNewline = line.startsWith("STRINGLN");
-    String text = line.substring(addNewline ? 9 : 7);
-    typeString(text);
-    if (addNewline) {
-      usb_hid1.keyboardPress(KEY_ENTER);
-      usb_hid2.keyboardPress(KEY_ENTER);
-      delay(50);
-      usb_hid1.keyboardReleaseAll();
-      usb_hid2.keyboardReleaseAll();
+  try {
+    if (kbState.defaultDelay > 0) {
+      delay(kbState.defaultDelay);
     }
-    return;
-  }
 
-  if (line.startsWith("REPEAT")) {
-    int count = line.substring(7).toInt();
-    for (int i = 0; i < count; i++) {
-      parseDuckyScript(kbState.lastCommand);
-      delay(50); 
+    if (line.startsWith("DEFINE")) {
+      int firstSpace = line.indexOf(' ');
+      int secondSpace = line.indexOf(' ', firstSpace + 1);
+      if (firstSpace < 0 || secondSpace < 0) {
+        handleError("Invalid DEFINE syntax");
+        return;
+      }
+      String constName = line.substring(firstSpace + 1, secondSpace);
+      if (constName.length() == 0) {
+        handleError("Empty constant name");
+        return;
+      }
+      String constValue = line.substring(secondSpace + 1);
+      kbState.variables[constName] = constValue;
+      return;
     }
+
+    if (line.startsWith("VAR")) {
+      int firstSpace = line.indexOf(' ');
+      if (firstSpace < 0) {
+        handleError("Invalid VAR syntax");
+        return;
+      }
+      String varName = line.substring(firstSpace + 1);
+      int secondSpace = varName.indexOf(' ');
+      String varValue = "";
+      if (secondSpace > 0) {
+        varValue = evaluateExpression(varName.substring(secondSpace + 1));
+        varName = varName.substring(0, secondSpace);
+      }
+      if (varName.length() == 0) {
+        handleError("Empty variable name");
+        return;
+      }
+      if (kbState.variables.size() >= MAX_VARIABLES) {
+        handleError("Too many variables");
+        return;
+      }
+      kbState.variables[varName] = varValue;
+      return;
+    }
+
+    if (line.startsWith("STRING")) {
+      bool addNewline = line.startsWith("STRINGLN");
+      if (line.length() < (addNewline ? 9 : 7)) {
+        handleError("Invalid STRING syntax");
+        return;
+      }
+      String text = line.substring(addNewline ? 9 : 7);
+      
+      while (text.indexOf("$") >= 0) {
+        int start = text.indexOf("$");
+        int end = text.indexOf(" ", start);
+        if (end < 0) end = text.length();
+        String varName = text.substring(start + 1, end);
+        if (kbState.variables.count(varName) == 0) {
+          handleError("Undefined variable: " + varName);
+          return;
+        }
+        String value = kbState.variables[varName];
+        text = text.substring(0, start) + value + text.substring(end);
+      }
+      
+      typeString(text);
+      if (addNewline) {
+        usb_hid1.keyboardPress(KEY_ENTER);
+        usb_hid2.keyboardPress(KEY_ENTER);
+        delay(50);
+        usb_hid1.keyboardReleaseAll();
+        usb_hid2.keyboardReleaseAll();
+      }
+      return;
+    }
+
+    if (line.startsWith("REPEAT")) {
+      if (kbState.lastCommand.length() == 0) {
+        handleError("No command to repeat");
+        return;
+      }
+      int count = line.substring(7).toInt();
+      if (count <= 0 || count > 100) {
+        handleError("Invalid repeat count");
+        return;
+      }
+      for (int i = 0; i < count; i++) {
+        parseDuckyScript(kbState.lastCommand);
+        delay(50);
+      }
+      return;
+    }
+
+    if (!handleKeyCommand(line)) {
+      handleError("Invalid key command");
+      return;
+    }
+
+  } catch (...) {
+    handleError("Unknown error processing command");
     return;
-  }
-
-  handleKeyCommand(line);
-
-  if (!line.startsWith("REPEAT")) { 
-    kbState.lastCommand = line;
   }
 }
 
-void handleKeyCommand(String line) {
-  String keys[5]; 
+bool handleKeyCommand(String line) {
+  String keys[5];
   int keyCount = 0;
   
   int start = 0;
@@ -216,6 +301,8 @@ void handleKeyCommand(String line) {
     keys[keyCount++] = line.substring(start);
   }
 
+  if (keyCount == 0) return false;
+
   bool shift = false, ctrl = false, alt = false, gui = false;
   int lastMod = 0;
 
@@ -225,8 +312,13 @@ void handleKeyCommand(String line) {
     else if (key == "SHIFT") shift = true;
     else if (key == "ALT") alt = true;
     else if (key == "GUI" || key == "WINDOWS") gui = true;
+    else return false; 
     lastMod = i;
   }
+
+  String finalKey = keys[lastMod + 1];
+  uint8_t keycode = getKeycode(finalKey);
+  if (keycode == 0) return false;
 
   if (shift) {
     usb_hid1.keyboardPress(KEY_LEFTSHIFT);
@@ -245,83 +337,23 @@ void handleKeyCommand(String line) {
     usb_hid2.keyboardPress(KEY_GUI);
   }
 
-  String finalKey = keys[lastMod + 1];
-  uint8_t keycode = getKeycode(finalKey);
-  if (keycode) {
-    usb_hid1.keyboardPress(keycode);
-    usb_hid2.keyboardPress(keycode);
-  }
-
+  usb_hid1.keyboardPress(keycode);
+  usb_hid2.keyboardPress(keycode);
   delay(50);
   usb_hid1.keyboardReleaseAll();
   usb_hid2.keyboardReleaseAll();
   delay(50);
-}
 
-uint8_t getKeycode(String key) {
-  if (key.length() == 1) {
-    return key.charAt(0);
-  }
-
-  if (key.startsWith("F") && key.length() <= 3) {
-    int fNum = key.substring(1).toInt();
-    if (fNum >= 1 && fNum <= 12) {
-      return KEY_F1 + (fNum - 1);
-    }
-  }
-
-  if (key == "ENTER") return KEY_ENTER;
-  if (key == "ESCAPE" || key == "ESC") return KEY_ESC;
-  if (key == "BACKSPACE") return KEY_BACKSPACE;
-  if (key == "DELETE") return KEY_DELETE;
-  if (key == "TAB") return KEY_TAB;
-  if (key == "SPACE") return ' ';
-  if (key == "CAPSLOCK") return KEY_CAPS_LOCK;
-  if (key == "PRINTSCREEN") return KEY_PRINT;
-  if (key == "SCROLLLOCK") return KEY_SCROLLLOCK;
-  if (key == "PAUSE") return KEY_PAUSE;
-  if (key == "INSERT") return KEY_INSERT;
-  if (key == "HOME") return KEY_HOME;
-  if (key == "PAGEUP") return KEY_PAGE_UP;
-  if (key == "PAGEDOWN") return KEY_PAGE_DOWN;
-  if (key == "END") return KEY_END;
-  if (key == "RIGHT" || key == "RIGHTARROW") return KEY_RIGHT_ARROW;
-  if (key == "LEFT" || key == "LEFTARROW") return KEY_LEFT_ARROW;
-  if (key == "DOWN" || key == "DOWNARROW") return KEY_DOWN_ARROW;
-  if (key == "UP" || key == "UPARROW") return KEY_UP_ARROW;
-  if (key == "MENU") return KEY_MENU;
-  if (key == "APP") return KEY_MENU;
-
-  if (key == "NUMLOCK") return KEY_NUM_LOCK;
-  if (key == "KP_SLASH") return KEY_KP_SLASH;
-  if (key == "KP_ASTERISK") return KEY_KP_ASTERISK;
-  if (key == "KP_MINUS") return KEY_KP_MINUS;
-  if (key == "KP_PLUS") return KEY_KP_PLUS;
-  if (key == "KP_ENTER") return KEY_KP_ENTER;
-
-  if (key == "BREAK" || key == "PAUSE") return KEY_PAUSE;
-  
-  if (key == "NUMPAD_0") return KEY_KP_0;
-  if (key == "NUMPAD_1") return KEY_KP_1;
-  if (key == "NUMPAD_2") return KEY_KP_2;
-  if (key == "NUMPAD_3") return KEY_KP_3;
-  if (key == "NUMPAD_4") return KEY_KP_4;
-  if (key == "NUMPAD_5") return KEY_KP_5;
-  if (key == "NUMPAD_6") return KEY_KP_6;
-  if (key == "NUMPAD_7") return KEY_KP_7;
-  if (key == "NUMPAD_8") return KEY_KP_8;
-  if (key == "NUMPAD_9") return KEY_KP_9;
-  if (key == "NUMPAD_DOT") return KEY_KP_DOT;
-  if (key == "NUMPAD_PLUS") return KEY_KP_PLUS;
-  if (key == "NUMPAD_MINUS") return KEY_KP_MINUS;
-  if (key == "NUMPAD_MULTIPLY") return KEY_KP_MULTIPLY;
-  if (key == "NUMPAD_DIVIDE") return KEY_KP_DIVIDE;
-  if (key == "NUMPAD_ENTER") return KEY_KP_ENTER;
-
-  return 0;
+  return true;
 }
 
 void typeString(String text) {
+  if (kbState.currentLocale == "DE") {
+    // German keyboard mappings - TBD
+  }
+  else if (kbState.currentLocale == "FR") {
+    // French keyboard mappings - TBD
+  }
   for (unsigned int i = 0; i < text.length(); i++) {
     char c = text.charAt(i);
     
@@ -535,6 +567,40 @@ long random(long min, long max) {
 String evaluateExpression(String expr) {
   expr.trim();
   
+  if (expr.indexOf("*") >= 0) {
+    int opIndex = expr.indexOf("*");
+    String left = evaluateExpression(expr.substring(0, opIndex));
+    String right = evaluateExpression(expr.substring(opIndex + 1));
+    return String(left.toInt() * right.toInt());
+  }
+  
+  if (expr.indexOf("/") >= 0) {
+    int opIndex = expr.indexOf("/");
+    String left = evaluateExpression(expr.substring(0, opIndex));
+    String right = evaluateExpression(expr.substring(opIndex + 1));
+    if (right.toInt() != 0) {
+      return String(left.toInt() / right.toInt());
+    }
+    return "0"; 
+  }
+  
+  if (expr.indexOf("%") >= 0) {
+    int opIndex = expr.indexOf("%");
+    String left = evaluateExpression(expr.substring(0, opIndex));
+    String right = evaluateExpression(expr.substring(opIndex + 1));
+    if (right.toInt() != 0) {
+      return String(left.toInt() % right.toInt());
+    }
+    return "0"; 
+  }
+  
+  if (expr.indexOf("-") >= 0) {
+    int opIndex = expr.indexOf("-");
+    String left = evaluateExpression(expr.substring(0, opIndex));
+    String right = evaluateExpression(expr.substring(opIndex + 1));
+    return String(left.toInt() - right.toInt());
+  }
+  
   if (expr.startsWith("$")) {
     String varName = expr.substring(1);
     if (kbState.variables.count(varName) > 0) {
@@ -577,13 +643,103 @@ bool evaluateCondition(String condition) {
     return left == right;
   }
   
+  if (condition.indexOf("!=") >= 0) {
+    int opIndex = condition.indexOf("!=");
+    String left = evaluateExpression(condition.substring(0, opIndex));
+    String right = evaluateExpression(condition.substring(opIndex + 2));
+    return left != right;
+  }
+
+  if (condition.indexOf(">=") >= 0) {
+    int opIndex = condition.indexOf(">=");
+    String left = evaluateExpression(condition.substring(0, opIndex));
+    String right = evaluateExpression(condition.substring(opIndex + 2));
+    return left.toInt() >= right.toInt();
+  }
+
+  if (condition.indexOf("<=") >= 0) {
+    int opIndex = condition.indexOf("<=");
+    String left = evaluateExpression(condition.substring(0, opIndex));
+    String right = evaluateExpression(condition.substring(opIndex + 2));
+    return left.toInt() <= right.toInt();
+  }
+  
   if (condition.indexOf(">") >= 0) {
     int opIndex = condition.indexOf(">");
     String left = evaluateExpression(condition.substring(0, opIndex));
     String right = evaluateExpression(condition.substring(opIndex + 1));
     return left.toInt() > right.toInt();
   }
-  
+
+  if (condition.indexOf("<") >= 0) {
+    int opIndex = condition.indexOf("<");
+    String left = evaluateExpression(condition.substring(0, opIndex));
+    String right = evaluateExpression(condition.substring(opIndex + 1));
+    return left.toInt() < right.toInt();
+  }
   
   return false;
+}
+
+uint8_t getKeycode(String key) {
+  if (key.length() == 1) {
+    return key.charAt(0);
+  }
+
+  if (key.startsWith("F") && key.length() <= 3) {
+    int fNum = key.substring(1).toInt();
+    if (fNum >= 1 && fNum <= 12) {
+      return KEY_F1 + (fNum - 1);
+    }
+  }
+
+  if (key == "ENTER") return KEY_ENTER;
+  if (key == "ESCAPE" || key == "ESC") return KEY_ESC;
+  if (key == "BACKSPACE") return KEY_BACKSPACE;
+  if (key == "DELETE") return KEY_DELETE;
+  if (key == "TAB") return KEY_TAB;
+  if (key == "SPACE") return ' ';
+  if (key == "CAPSLOCK") return KEY_CAPS_LOCK;
+  if (key == "PRINTSCREEN") return KEY_PRINT;
+  if (key == "SCROLLLOCK") return KEY_SCROLLLOCK;
+  if (key == "PAUSE") return KEY_PAUSE;
+  if (key == "INSERT") return KEY_INSERT;
+  if (key == "HOME") return KEY_HOME;
+  if (key == "PAGEUP") return KEY_PAGE_UP;
+  if (key == "PAGEDOWN") return KEY_PAGE_DOWN;
+  if (key == "END") return KEY_END;
+  if (key == "RIGHT" || key == "RIGHTARROW") return KEY_RIGHT_ARROW;
+  if (key == "LEFT" || key == "LEFTARROW") return KEY_LEFT_ARROW;
+  if (key == "DOWN" || key == "DOWNARROW") return KEY_DOWN_ARROW;
+  if (key == "UP" || key == "UPARROW") return KEY_UP_ARROW;
+  if (key == "MENU") return KEY_MENU;
+  if (key == "APP") return KEY_MENU;
+
+  if (key == "NUMLOCK") return KEY_NUM_LOCK;
+  if (key == "KP_SLASH") return KEY_KP_SLASH;
+  if (key == "KP_ASTERISK") return KEY_KP_ASTERISK;
+  if (key == "KP_MINUS") return KEY_KP_MINUS;
+  if (key == "KP_PLUS") return KEY_KP_PLUS;
+  if (key == "KP_ENTER") return KEY_KP_ENTER;
+
+  if (key == "BREAK" || key == "PAUSE") return KEY_PAUSE;
+  
+  if (key == "NUMPAD_0") return KEY_KP_0;
+  if (key == "NUMPAD_1") return KEY_KP_1;
+  if (key == "NUMPAD_2") return KEY_KP_2;
+  if (key == "NUMPAD_3") return KEY_KP_3;
+  if (key == "NUMPAD_4") return KEY_KP_4;
+  if (key == "NUMPAD_5") return KEY_KP_5;
+  if (key == "NUMPAD_6") return KEY_KP_6;
+  if (key == "NUMPAD_7") return KEY_KP_7;
+  if (key == "NUMPAD_8") return KEY_KP_8;
+  if (key == "NUMPAD_9") return KEY_KP_9;
+  if (key == "NUMPAD_DOT") return KEY_KP_DOT;
+  if (key == "NUMPAD_PLUS") return KEY_KP_PLUS;
+  if (key == "NUMPAD_MINUS") return KEY_KP_MINUS;
+  if (key == "NUMPAD_MULTIPLY") return KEY_KP_MULTIPLY;
+  if (key == "NUMPAD_DIVIDE") return KEY_KP_DIVIDE;
+  if (key == "NUMPAD_ENTER") return KEY_KP_ENTER;
+
+  return 0;
 }
