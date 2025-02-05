@@ -1,6 +1,6 @@
-# HackDucky Scripting 101: Your First Payload
+# mm you got a hackducky? - lets program it!
 
-Welcome, you want to make a bad usb i see. Well, you're in luck! this is the perfect ysws for you !
+Welcome, you want to make a bad usb I see,k. Well, you're in luck! this is the perfect ysws for you !
 
 ---
 
@@ -99,16 +99,20 @@ CALL PRINT_HEADER
 
 ---
 
-## 🎯 What’s Next?
-Now you know the basics—time to experiment! Try making:
-✅ A script that opens a website and types a message.
-✅ A prank script that types "Hack Club rules!" randomly.
-✅ A function that automates logins.
+## 🎯 What’s Next?  
+
+Now you know the basics—time to experiment! Try making:  
+
+✅ **A script that opens a website and types a message**  
+✅ **A prank script that rickroles someone as soon as you plug in the usb**  
+✅ **A function that automates logins**  
+✅ **A script that runs Doom in the terminal!** – *Interesting, I see.*  
+
 
 ### ⚡ Pro Tips:
 - Start simple, then add more features.
 - Use `DELAY` wisely—too fast and your computer might miss keystrokes.
-- Keep scripts readable—future-you will thank you!
+- Have fun!
 
 Drop your creations in the #hackducky channel on the hack club slack, and let's see what you build! 🛠️🔥
 
