@@ -1,12 +1,9 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useSearchParams } from 'next/navigation';
 
 export default function SubmitPage() {
     const router = useRouter();
-    const searchParams = useSearchParams();
-    const script = searchParams.get('script');
 
     return (
         <div className="min-h-screen h-screen bg-[#0a0a0a] text-[#39ff14] flex flex-col">
