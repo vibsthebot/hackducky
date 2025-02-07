@@ -8,17 +8,16 @@ export default function Home() {
   const [showTerminal, setShowTerminal] = useState(false);
 
   useEffect(() => {
-    // Wait for animation to complete (4s) plus a bit extra for smooth transition
     const timer = setTimeout(() => {
       const introAnimation = document.querySelector('.intro-animation');
-      if (introAnimation) {
+      if (introAnimation instanceof HTMLElement) {
         introAnimation.classList.add('animate-zoomIn');
         console.log('Animation started');
         setTimeout(() => {
-          introAnimation.style.display = 'none';
+          introAnimation.classList.add('hidden');
           setShowTerminal(true);
           console.log('Intro hidden, terminal shown');
-        }, 1000); // Ensure this matches the duration of the zoomIn animation
+        }, 1000);
       }
     }, 4500);
 
@@ -27,7 +26,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#0a0a0a] font-mono text-[#39ff14] flex flex-col overflow-hidden">
-      <div className="intro-animation">
+      <div className="intro-animation transition-opacity duration-300">
         <IntroAnimation />
       </div>
       {showTerminal && (

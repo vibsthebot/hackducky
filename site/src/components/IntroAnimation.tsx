@@ -24,7 +24,7 @@ const MatrixRain: React.FC = () => {
     setOpacities(initialOpacities);
 
     const interval = setInterval(() => {
-      setColumns(prev => prev.map((col, i) => {
+      setColumns(prev => prev.map(col => {  // Removed unused 'i' parameter
         if (Math.random() < 0.05) return '';
         const newChar = chars[Math.floor(Math.random() * chars.length)];
         return (col + newChar).slice(-25); // Keep last 25 characters
@@ -63,10 +63,19 @@ const IntroAnimation: React.FC = () => {
   const [isZooming, setIsZooming] = useState(false);
 
   useEffect(() => {
-    setTimeout(() => setShowUSB(true), 1000);
-    setTimeout(() => setUsbPlugged(true), 2000);
-    setTimeout(() => setShowMatrix(true), 3000);
-    setTimeout(() => setIsZooming(true), 4000);
+    // Set up animation sequence
+    const timer1 = setTimeout(() => setShowUSB(true), 1000);
+    const timer2 = setTimeout(() => setUsbPlugged(true), 2000);
+    const timer3 = setTimeout(() => setShowMatrix(true), 3000);
+    const timer4 = setTimeout(() => setIsZooming(true), 4000);
+
+    // Cleanup timers
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      clearTimeout(timer3);
+      clearTimeout(timer4);
+    };
   }, []);
 
   return (

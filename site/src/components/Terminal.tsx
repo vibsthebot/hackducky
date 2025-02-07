@@ -8,12 +8,9 @@ interface TerminalProps {
 }
 
 const Terminal: React.FC<TerminalProps> = ({ className }) => {
-    const router = useRouter();
     const [lines, setLines] = useState<string[]>([]);
     const [input, setInput] = useState('');
-    const [scriptMode, setScriptMode] = useState(false);
-    const [script, setScript] = useState('');
-    const [showSubmit, setShowSubmit] = useState(false);
+    const router = useRouter();
     const [initialized, setInitialized] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
     const terminalRef = useRef<HTMLDivElement>(null);
@@ -194,14 +191,6 @@ const Terminal: React.FC<TerminalProps> = ({ className }) => {
                         autoFocus
                     />
                 </div>
-                {showSubmit && (
-                    <button 
-                        className="mt-4 px-4 py-2 bg-[#39ff14]/20 text-[#39ff14] border border-[#39ff14] rounded hover:bg-[#39ff14]/30 transition-colors"
-                        onClick={() => window.location.href = '/editor'}
-                    >
-                        Go to Editor
-                    </button>
-                )}
             </div>
         </div>
     );
