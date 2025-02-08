@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 import readmeContent from '@/data/readme';
-import tutorialContent from '@/data/tutorial';
+import tutorialContent from '@/data/tutorial_readme';
 
 const DocumentationPage = () => {
     const [activeTab, setActiveTab] = useState<'readme' | 'tutorial'>('readme');
