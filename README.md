@@ -13,7 +13,6 @@ Hackducky is hackclubs own version of making a USB rubber ducky built by hackclu
     -  Dual USB ports (USB-A and USB-C)
     -  LED for the status - you can use it for other things if you like !
     -  Button for any extra features you may want to add !
-    -  Buzzer. - Maybe ?
 - Micro SD Card
 
 
