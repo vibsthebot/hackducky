@@ -61,16 +61,19 @@ Hackducky is hackclubs own version of making a USB rubber ducky built by hackclu
 ## Troubleshooting the LED's
 
 1. LED rapidly blinking at startup:
-   - Check if MicroSD card is properly inserted
-   - Verify card is formatted as FAT32
-   - Ensure script file has .txt extension
+ - Programming Mode
+    - All is working great!
+    - Its meant to blink rapidly in this mode
+ - Payload Mode
+       - Something is wrong with your duckyscript
+       - Something is wrong with the firmware ( Create an Issue! )
 
-2. Script not running:
+3. Script not running:
    - Check script syntax
    - Verify file is properly saved
    - Try reformatting MicroSD card
 
-3. Keyboard not recognized:
+4. Keyboard not recognized:
    - Try different USB port
    - Check USB connection
    - Verify target system supports USB HID
