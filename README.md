@@ -47,11 +47,9 @@ Hackducky is hackclubs own version of making a USB rubber ducky built by hackclu
 
 ## What the LED indicators mean
 
-- Triple blink: Error occurred with your script
-- Double blink: Success ! your script worked
-- Single blink: Working/Processing - running
-- Rapid blinking: SD card error  - oh no something broke
-
+- Triple blink: Startup Sequence
+- Single blink: Working/Processing - running/Starting Execution
+- Rapid blinking: DuckyScript is incorrect / Firmware broke 😭 - Create a PR or new issue desribing the firmware problem
 
 ## Troubleshooting the LED's
 
