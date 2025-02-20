@@ -17,11 +17,7 @@ Hackducky is hackclubs own version of making a USB rubber ducky built by hackclu
 
 ## Getting Started
 
-1. Format your MicroSD card as FAT32
-2. Create a script file with `.txt` extension (e.g., `payload.txt`) - this will be your main attack script
-3. Write your DuckyScript commands in the file – check out [tutorial.md](tutorial.md) for more info on how to make a DuckyScript.
-4. Insert the MicroSD card into the HackDucky with your file loaded
-5. Connect to target computer using either USB port and watch the computer be taken over ! ( ethically ofc)
+1. - WIP
 
 # Submission Criteria  
 
