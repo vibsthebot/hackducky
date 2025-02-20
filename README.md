@@ -9,11 +9,10 @@ Hackducky is hackclubs own version of making a USB rubber ducky built by hackclu
 ## What you get
 
 - Hackducky Board
-    -  Includes MicroSD card slot (connected via SPI)
     -  Dual USB ports (USB-A and USB-C)
     -  LED for the status - you can use it for other things if you like !
     -  Button for any extra features you may want to add !
-- Micro SD Card
+    -  All duckyscripts are stored in the Hackduckys flash memory !
 
 
 ## Getting Started
