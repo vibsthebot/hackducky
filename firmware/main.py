@@ -3,8 +3,6 @@ import digitalio
 import time
 import usb_hid
 import os
-from adafruit_hid.keyboard import Keyboard
-from adafruit_hid.keycode import Keycode
 
 print("Main.py: Starting up...")
 time.sleep(1)  # Reduced delay for testing
@@ -28,7 +26,9 @@ try:
         flash_error()
     
     print(f"Main.py: Found {len(usb_hid.devices)} HID devices")
-    kbd = Keyboard(usb_hid.devices)
+    from layouts_manager import *
+    layout = "us"
+    keycode = keycodes[layout]
     print("Main.py: Keyboard initialized successfully")
     
     # Test keyboard initialization
@@ -48,49 +48,15 @@ def flash_status():
 def send_string(text):
     """Send a string as keyboard input"""
     print(f"Sending string: {text}")
-    for char in text:
-        try:
-            if char == '"':
-                print("Sending double quote")
-                kbd.press(Keycode.SHIFT)
-                kbd.press(Keycode.QUOTE)
-                kbd.release_all()
-            elif char == "'":
-                print("Sending single quote")
-                kbd.press(Keycode.QUOTE)
-                kbd.release_all()
-            elif char.isupper():
-                print(f"Sending uppercase {char}")
-                kbd.press(Keycode.SHIFT)
-                kbd.press(getattr(Keycode, char.upper()))
-                kbd.release_all()
-            elif char.isalpha():
-                print(f"Sending lowercase {char}")
-                kbd.press(getattr(Keycode, char.upper()))
-                kbd.release_all()
-            elif char.isdigit():
-                print(f"Sending digit {char}")
-                kbd.press(getattr(Keycode, f"N{char}"))
-                kbd.release_all()
-            elif char == ' ':
-                print("Sending space")
-                kbd.press(Keycode.SPACE)
-                kbd.release_all()
-            elif char == '.':
-                print("Sending period")
-                kbd.press(Keycode.PERIOD)
-                kbd.release_all()
-            elif char == '!':
-                print("Sending exclamation")
-                kbd.press(Keycode.SHIFT)
-                kbd.press(Keycode.ONE)
-                kbd.release_all()
-            else:
-                print(f"Skipping unsupported character: {char}")
-            time.sleep(0.1)  # Delay between keystrokes
-        except Exception as e:
-            print(f"Error sending character '{char}': {str(e)}")
-            continue
+    layouts[layout].write(text)
+    
+def set_layout(lyt):
+    if lyt not in list(layouts.keys()):
+        raise Exception(f"Layout '{lyt}' is not a valid layout ({', '.join(list(layouts.keys()))})")
+    global layout
+    global keycode
+    keycode = keycodes[lyt]
+    layout = lyt
 
 def interpret_ducky_script(filename):
     """Interpret a DuckyScript file and execute commands"""
@@ -112,6 +78,8 @@ def interpret_ducky_script(filename):
                         time.sleep(0.5)
                         send_string(parts[1])
                         flash_status()
+                    elif command == 'LAYOUT' and len(parts) > 1:
+                        set_layout(parts[1])
                     elif command == 'DELAY' and len(parts) > 1:
                         delay_time = float(parts[1]) / 1000.0
                         print(f"Delaying for {delay_time} seconds")
@@ -120,17 +88,17 @@ def interpret_ducky_script(filename):
                         second_part = parts[1].upper()
                         print(f"Processing GUI command with {second_part}")
                         if second_part == 'SPACE':
-                            kbd.press(Keycode.GUI)
+                            kbd.press(keycode.GUI)
                             time.sleep(0.1)
-                            kbd.press(Keycode.SPACE)
+                            kbd.press(keycode.SPACE)
                             time.sleep(0.1)
                             kbd.release_all()
                             # Add delay after GUI command
                             time.sleep(0.5)
                         elif second_part in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ':
-                            kbd.press(Keycode.GUI)
+                            kbd.press(keycode.GUI)
                             time.sleep(0.1)
-                            kbd.press(getattr(Keycode, second_part))
+                            kbd.press(getattr(keycode, second_part))
                             time.sleep(0.1)
                             kbd.release_all()
                             # Add delay after GUI command
@@ -138,7 +106,7 @@ def interpret_ducky_script(filename):
                         flash_status()
                     elif command == 'ENTER':
                         print("Sending ENTER")
-                        kbd.press(Keycode.ENTER)
+                        kbd.press(keycode.ENTER)
                         time.sleep(0.1)
                         kbd.release_all()
                         # Add delay after ENTER
