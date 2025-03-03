@@ -1,6 +1,6 @@
-# mm you got a hackducky? - lets program it!
+# do you have or want a hackducky, here are the basics!
 
-Welcome, you want to make a bad usb I see,k. Well, you're in luck! this is the perfect ysws for you !
+Welcome, have you ever wanted to plug in a USB drive to someones computer and take control, Well this is the perfect YSWS for you! Read On
 
 ---
 
