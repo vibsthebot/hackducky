@@ -49,7 +49,7 @@ const Terminal: React.FC<TerminalProps> = ({ className }) => {
                 const lastLine = prev[prev.length - 1];
                 return [...prev.slice(0, -1), lastLine + char];
             });
-            await new Promise(resolve => setTimeout(resolve, 50)); 
+            await new Promise(resolve => setTimeout(resolve, 25)); 
         }
         setLines(prev => [...prev, '', '']); 
     };
