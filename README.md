@@ -1,6 +1,6 @@
-# HackDucky - WIP
+# HackDucky - New YSWS!
 
-the hackclub themed USB rubber ducky ! - Check out [hackducky](https://hackclub.slack.com/archives/C08B8HZBC85)
+The hackclub themed USB rubber ducky ! - Check out [hackducky](https://hackclub.slack.com/archives/C08B8HZBC85)
 
 # What is this?
 
