@@ -46,10 +46,7 @@ HackDucky is a compact, powerful RP2040-based USB device inspired by the concept
 * Open-source hardware and firmware philosophy
 
 ## 📸 Preview
-![alt text](./img/sm_black_top%20(1).png)
-![alt text](./img/sm_black_bottom%20(1).png)
-![alt text](img/image-1.png)
-![alt text](img/image.png)
+Coming Soon
 ## 🔐 Disclaimer
 
 This device is for **educational and ethical hacking purposes only**. Use responsibly. The creators is not responsible for any misuse.
@@ -58,10 +55,10 @@ This device is for **educational and ethical hacking purposes only**. Use respon
 
 ## 📫 Connect
 
-Built with ❤️ by [Souptik Samanta](https://souptik.me) & [Arav Jhamb](https://github.com/The-UnknownHacker)
+Built with ❤️ by [Souptik Samanta](https://souptik.me) & [Aarav Jhamb](https://github.com/The-UnknownHacker)
 
-GitHub: [@souptik-samanta](https://github.com/souptik-samanta) & [Arav Jhamb](https://github.com/The-UnknownHacker)
-Instagram: [@souptik.me](https://instagram.com/souptik.me) & [Arav Jhamb](https://github.com/The-UnknownHacker)
+GitHub: [@souptik-samanta](https://github.com/souptik-samanta) & [Aarav Jhamb](https://github.com/The-UnknownHacker)
+Instagram: [@souptik.me](https://instagram.com/souptik.me) & [Aarav Jhamb](aaravjhamb.com)
 Hack Clubber & Hardware Hacker 💻🔌             Hack Clubber & Ethical Hacker 💻🔌
  
 
