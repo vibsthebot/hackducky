@@ -24,17 +24,17 @@ try:
     if not usb_hid.devices:
         print("Main.py: No USB HID devices found!")
         flash_error()
-    
+
     print(f"Main.py: Found {len(usb_hid.devices)} HID devices")
     from layouts_manager import *
     layout = "us"
     keycode = keycodes[layout]
     print("Main.py: Keyboard initialized successfully")
-    
+
     # Test keyboard initialization
     kbd.release_all()
     print("Main.py: Keyboard test successful")
-    
+
 except Exception as e:
     print(f"Main.py: Failed to initialize keyboard: {str(e)}")
     flash_error()
@@ -49,7 +49,7 @@ def send_string(text):
     """Send a string as keyboard input"""
     print(f"Sending string: {text}")
     layouts[layout].write(text)
-    
+
 def set_layout(lyt):
     if lyt not in list(layouts.keys()):
         raise Exception(f"Layout '{lyt}' is not a valid layout ({', '.join(list(layouts.keys()))})")
@@ -73,7 +73,7 @@ def interpret_ducky_script(filename):
                     print(f"Processing line: {line}")
                     parts = line.split(' ', 1)
                     command = parts[0].upper()
-                    
+
                     if command == 'STRING' and len(parts) > 1:
                         print(f"Found STRING command with text: {parts[1]}")
                         # Add delay before typing
@@ -134,10 +134,10 @@ try:
     except OSError:
         print("Creating /ducks directory")
         os.mkdir('/ducks')
-    
+
     files = os.listdir('/ducks')
     ducky_files = sorted(['/ducks/' + f for f in files if f.endswith('.ducky')])
-    
+    print(ducky_files)
     if not ducky_files:
         print("No ducky scripts found")
         # Flash LED pattern to indicate no scripts
@@ -168,4 +168,4 @@ except Exception as e:
             time.sleep(0.1)
         time.sleep(1)
 
-print("Execution complete") 
+print("Execution complete")
