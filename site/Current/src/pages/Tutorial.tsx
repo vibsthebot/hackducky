@@ -10,7 +10,7 @@ const Tutorial = () => {
     { command: "STRING", description: "Types the specified text exactly as written", example: "STRING Hello World!" },
     { command: "ENTER", description: "Presses the Enter/Return key", example: "ENTER" },
     { command: "DELAY", description: "Waits for specified milliseconds before next command", example: "DELAY 1000" },
-    { command: "CTRL", description: "Holds Ctrl key while pressing next key", example: "CTRL a" },
+    { command: "CONTROL", description: "Holds Ctrl key while pressing next key", example: "CONTROL a" },
     { command: "ALT", description: "Holds Alt key while pressing next key", example: "ALT TAB" },
     { command: "GUI", description: "Windows/Super/Cmd key for opening start menu", example: "GUI r" },
     { command: "SHIFT", description: "Holds Shift key while pressing next key", example: "SHIFT TAB" },
@@ -76,7 +76,7 @@ const Tutorial = () => {
                     <li><strong>REM</strong>: Comments for humans, ignored by the duck.</li>
                     <li><strong>DELAY</strong>: Pauses between actions (milliseconds).</li>
                     <li><strong>STRING</strong>: Types out text like a human.</li>
-                    <li><strong>GUI, CTRL, ALT, SHIFT</strong>: Modifier keys for shortcuts.</li>
+                    <li><strong>GUI, CONTROL, ALT, SHIFT</strong>: Modifier keys for shortcuts.</li>
                     <li><strong>ENTER</strong>: Simulates pressing Enter.</li>
                     <li><strong>TAB, ESCAPE, SPACE, BACKSPACE, DELETE</strong>: Special keys.</li>
                     <li><strong>F1-F12, Arrow Keys, HOME/END, PAGEUP/PAGEDOWN, CAPSLOCK</strong>: Navigation and function keys.</li>
