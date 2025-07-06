@@ -114,6 +114,128 @@ def interpret_ducky_script(filename):
                         # Add delay after ENTER
                         time.sleep(0.5)
                         flash_status()
+                    elif command == 'TAB':
+                        print("Sending TAB")
+                        kbd.press(keycode.TAB)
+                        time.sleep(0.1)
+                        kbd.release_all()
+                        # Add delay after TAB
+                        time.sleep(0.5)
+                        flash_status()
+                    elif command == 'ESCAPE':
+                        print("Sending ESCAPE")
+                        kbd.press(keycode.ESCAPE)
+                        time.sleep(0.1)
+                        kbd.release_all()
+                        # Add delay after ESCAPE
+                        time.sleep(0.5)
+                        flash_status()
+                    elif command == 'SPACE':
+                        print("Sending SPACE")
+                        kbd.press(keycode.SPACE)
+                        time.sleep(0.1)
+                        kbd.release_all()
+                        # Add delay after SPACE
+                        time.sleep(0.5)
+                        flash_status()
+                    elif command == 'BACKSPACE':
+                        print("Sending BACKSPACE")
+                        kbd.press(keycode.BACKSPACE)
+                        time.sleep(0.1)
+                        kbd.release_all()
+                        # Add delay after BACKSPACE
+                        time.sleep(0.5)
+                        flash_status()
+                    elif command == 'DELETE':
+                        print("Sending DELETE")
+                        kbd.press(keycode.DELETE)
+                        time.sleep(0.1)
+                        kbd.release_all()
+                        # Add delay after DELETE
+                        time.sleep(0.5)
+                        flash_status()
+                    elif command[0] == 'F' and command[1:].isdigit():
+                        key_num = int(command[1:])
+                        if key_num in range(1, 13):
+                            print(f"Sending F{key_num}")
+                            kbd.press(getattr(keycode, f'F{key_num}'))
+                            time.sleep(0.1)
+                            kbd.release_all()
+                            # Add delay after function key
+                            time.sleep(0.5)
+                            flash_status()
+                    elif command == 'CAPSLOCK':
+                        print("Toggling CAPSLOCK")
+                        kbd.press(keycode.CAPS_LOCK)
+                        time.sleep(0.1)
+                        kbd.release_all()
+                        # Add delay after CAPSLOCK
+                        time.sleep(0.5)
+                        flash_status()
+                    elif command == 'LEFTARROW':
+                        print("Sending LEFTARROW")
+                        kbd.press(keycode.LEFT_ARROW)
+                        time.sleep(0.1)
+                        kbd.release_all()
+                        # Add delay after LEFT_ARROW
+                        time.sleep(0.5)
+                        flash_status()
+                    elif command == 'RIGHTARROW':
+                        print("Sending RIGHTARROW")
+                        kbd.press(keycode.RIGHT_ARROW)
+                        time.sleep(0.1)
+                        kbd.release_all()
+                        # Add delay after RIGHT_ARROW
+                        time.sleep(0.5)
+                        flash_status()
+                    elif command == 'UPARROW':
+                        print("Sending UPARROW")
+                        kbd.press(keycode.UP_ARROW)
+                        time.sleep(0.1)
+                        kbd.release_all()
+                        # Add delay after UP_ARROW
+                        time.sleep(0.5)
+                        flash_status()
+                    elif command == 'DOWNARROW':
+                        print("Sending DOWNARROW")
+                        kbd.press(keycode.DOWN_ARROW)
+                        time.sleep(0.1)
+                        kbd.release_all()
+                        # Add delay after DOWN_ARROW
+                        time.sleep(0.5)
+                        flash_status()
+                    elif command == 'HOME':
+                        print("Sending HOME")
+                        kbd.press(keycode.HOME)
+                        time.sleep(0.1)
+                        kbd.release_all()
+                        # Add delay after HOME
+                        time.sleep(0.5)
+                        flash_status()
+                    elif command == 'END':
+                        print("Sending END")
+                        kbd.press(keycode.END)
+                        time.sleep(0.1)
+                        kbd.release_all()
+                        # Add delay after END
+                        time.sleep(0.5)
+                        flash_status()
+                    elif command == 'PAGE_UP':
+                        print("Sending PAGE_UP")
+                        kbd.press(keycode.PAGE_UP)
+                        time.sleep(0.1)
+                        kbd.release_all()
+                        # Add delay after PAGE_UP
+                        time.sleep(0.5)
+                        flash_status()
+                    elif command == 'PAGE_DOWN':
+                        print("Sending PAGE_DOWN")
+                        kbd.press(keycode.PAGE_DOWN)
+                        time.sleep(0.1)
+                        kbd.release_all()
+                        # Add delay after PAGE_DOWN
+                        time.sleep(0.5)
+                        flash_status()
                     elif command == 'DEFAULT_DELAY':
                         print("setting DEFAULT_DELAY")
                         default_delay = float(parts[1]) / 1000.0

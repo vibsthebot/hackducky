@@ -5,7 +5,7 @@ import usb_cdc
 import usb_hid
 import time
 
-program_pin = digitalio.DigitalInOut(board.GP0)
+program_pin = digitalio.DigitalInOut(board.GP25)
 program_pin.direction = digitalio.Direction.INPUT
 program_pin.pull = digitalio.Pull.UP
 

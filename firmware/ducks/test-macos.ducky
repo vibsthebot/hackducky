@@ -1,10 +1,17 @@
 REM This is just to test the menu functions
 REM This opens Spotlight on macOS
 REM Test macOS keyboard shortcuts
+F1
+F1
+F1
 DEFAULT_DELAY 1000
 GUI SPACE
 DELAY 500
+CAPSLOCK
 STRING terminal
+SPACE
+LEFTARROW
+DELETE
 ENTER
 DELAY 1000
 STRING echo "Hello from BadUSB"
@@ -13,3 +20,8 @@ DELAY 500
 GUI A
 GUI C
 GUI W
+GUI SPACE
+TAB
+DELAY 500
+ESCAPE
+DELAY 500
