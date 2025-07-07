@@ -35,6 +35,7 @@ try:
     kbd.release_all()
     print("Main.py: Keyboard test successful")
 
+
 except Exception as e:
     print(f"Main.py: Failed to initialize keyboard: {str(e)}")
     flash_error()
@@ -58,8 +59,49 @@ def set_layout(lyt):
     keycode = keycodes[lyt]
     layout = lyt
 
+def press_modifier(parts, modifier_key):
+    """Generic function to handle modifier key combinations (GUI, CTRL, SHIFT, ALT)"""
+    if len(parts) < 2:
+        return
+        
+    second_part = parts[1].upper()
+    modifier_name = modifier_key.upper()
+    
+    print(f"Processing {modifier_name} command with {second_part}")
+    
+    # Get the modifier keycode attribute
+    modifier_keycode = getattr(keycode, modifier_key.upper())
+    
+    if second_part == 'SPACE':
+        kbd.press(modifier_keycode)
+        time.sleep(0.1)
+        kbd.press(keycode.SPACE)
+        time.sleep(0.1)
+        kbd.release_all()
+        time.sleep(0.5)  # Add delay after modifier command
+    elif second_part == 'CONTROL' or second_part == 'SHIFT' or second_part == 'ALT' or second_part == 'GUI':
+        kbd.press(modifier_keycode)
+        press_modifier(parts[2:], second_part)
+        time.sleep(0.1)
+        kbd.release_all()
+        time.sleep(0.5)
+    elif len(second_part) == 1 and second_part in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ':
+        kbd.press(modifier_keycode)
+        time.sleep(0.1)
+        if hasattr(keycode, second_part):
+            kbd.press(getattr(keycode, second_part))
+        else:
+            # For characters that don't have direct keycode attributes
+            layouts[layout].write(second_part.lower())
+        time.sleep(0.1)
+        kbd.release_all()
+        time.sleep(0.5)  # Add delay after modifier command
+    
+    flash_status()
+
 def interpret_ducky_script(filename):
     """Interpret a DuckyScript file and execute commands"""
+    
     try:
         with open(filename, 'r', encoding='utf-8-sig') as file:
             default_delay = 0.2
@@ -86,26 +128,8 @@ def interpret_ducky_script(filename):
                         delay_time = float(parts[1]) / 1000.0
                         print(f"Delaying for {delay_time} seconds")
                         time.sleep(delay_time)
-                    elif command == 'GUI' and len(parts) > 1:
-                        second_part = parts[1].upper()
-                        print(f"Processing GUI command with {second_part}")
-                        if second_part == 'SPACE':
-                            kbd.press(keycode.GUI)
-                            time.sleep(0.1)
-                            kbd.press(keycode.SPACE)
-                            time.sleep(0.1)
-                            kbd.release_all()
-                            # Add delay after GUI command
-                            time.sleep(0.5)
-                        elif second_part in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ':
-                            kbd.press(keycode.GUI)
-                            time.sleep(0.1)
-                            kbd.press(getattr(keycode, second_part))
-                            time.sleep(0.1)
-                            kbd.release_all()
-                            # Add delay after GUI command
-                            time.sleep(0.5)
-                        flash_status()
+                    elif (command == 'GUI' or command == 'CTRL' or command == 'SHIFT' or command == 'ALT') and len(parts) > 1:
+                        press_modifier(parts, command)
                     elif command == 'ENTER':
                         print("Sending ENTER")
                         kbd.press(keycode.ENTER)
